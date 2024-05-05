@@ -1,6 +1,7 @@
 import pyspark.sql.functions as F  # Import alias for functions
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
+from pyspark.sql.functions import col,lit
 
 spark = SparkSession.builder.appName('load_data').getOrCreate()
 
@@ -29,23 +30,14 @@ data = spark.read.csv("/opt/bitnami/spark/data/stocks_price_final.csv",
                        header=True,
                        schema=final_struc)
 
-
 data.printSchema()
 data.show()
 
-#Rename market.cap
-data=data.withColumnRenamed("market.cap","market_cap")
 
-#Schema
-data.schema
+data.write.csv("dataset.csv")
+data.select(['symbol', 'date', 'market_cap']).write.csv("dataset_select.csv")
 
-#More operations
-data.dtypes
-data.head(2)
-data.show(5)
-data.first()
-data.columns
-data.count()
-data.distinct().count()
-
-spark.stop()
+data.write.json("dataset.json")
+data.write.parquet("dataset.parquet")
+data.write.orc("dataset.orc")
+data.write.text("dataset.txt")
